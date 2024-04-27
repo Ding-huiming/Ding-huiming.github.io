@@ -8,21 +8,178 @@
 <body>
     <h1>Face Comparison</h1>
     <div>
-        <input type="file" id="image1Input">
+        <input type="file" id="image1Input" onchange="previewImage(this)">
         <img id="image1" src="" alt="Image 1">
     </div>
     <div>
-        <input type="file" id="image2Input">
-        <img id="image2" src="" alt="Image 2">
+        <!-- 使用拍照上传方式 -->
+        <input type="file" accept="image/*" capture="camera" id="image2Input" style="display:none;" onchange="readFile(this)">
+        <div class="buttonphoto">
+            <button type="button" onclick="document.getElementById('image2Input').click()">请自拍您和现场照</button>
+        </div>
+        <img id="image2" src="" alt="Image 2" width="200">
     </div>
-    <button id="compareButton">Compare Faces</button>
+    <div class="button">
+        <button type="submit"  onclick="initrun()" id="submitinitrun">点我后才能签到</button>
+    </div>
     <div id="result"></div>
     <div id="timeDisplay"></div>
 
-
     <!-- 引入 face-api.js 库 -->
     <script src="dist/face-api.min.js"></script>
-    <!-- 引入你的 JavaScript 文件 -->
-    <script src="Compare.js"></script>
+    <script>
+        // 使用 Promise 和 .then() 来处理异步操作
+        faceapi.loadSsdMobilenetv1Model('/weights')
+            .then(() => faceapi.loadFaceLandmarkModel('/weights'))
+            .then(() => faceapi.loadFaceRecognitionModel('/weights'))
+            .then(() => {
+                console.log('模型加载完成！');
+            })
+            .catch(error => {
+                console.error('加载模型时出现错误：', error);
+            });
+
+        // 声明全局变量 descriptors，初始化为空数组
+        var descriptors = [];
+        function previewImage(obj){
+            var file = obj.files[0];
+            // 判断类型是不是图片
+            if (!/image\/\w+/.test(file.type)) {
+                alert("请确保文件为图像类型");
+                return false;
+            }
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e){
+                dealImage(this.result, { width: 600 }, function(base){
+                    document.getElementById('image1').setAttribute('src', base);
+                    // 创建新的图像元素
+                    const imageElement = new Image();
+                    // 设置图像元素的 src 属性为 base64 字符串
+                    imageElement.src = base;
+                    // 将图像元素传递给人脸处理函数
+                    processImage(imageElement);
+                    document.getElementById('image1').setAttribute('width',"200");
+                });
+            };
+        }
+
+        function readFile(obj){
+            var file = obj.files[0];
+            //判断类型是不是图片
+            if(!/image\/\w+/.test(file.type)){
+                alert("请确保文件为图像类型");
+                return false;
+            }
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e){
+                dealImage(this.result, { width: 600 }, function(base){
+                    document.getElementById('image2').setAttribute('src', base);
+                    // 创建新的图像元素
+                    const imageElement = new Image();
+                    // 设置图像元素的 src 属性为 base64 字符串
+                    imageElement.src = base;
+                    // 将图像元素传递给人脸处理函数
+                    processImage(imageElement);
+                    document.getElementById('image2').setAttribute('width',"200");
+                });
+            }
+        }
+
+
+        function processImage(imageElement) {
+            return new Promise((resolve, reject) => {
+                // 进行人脸检测和特征提取
+                faceapi.detectSingleFace(imageElement).withFaceLandmarks().withFaceDescriptor()
+                    .then(detection => {
+                        if (detection) {
+                            descriptors.push(detection.descriptor);
+                            console.log('Face detected and descriptor saved:', descriptors);
+                        } else {
+                            console.error('No face detected in the uploaded image');
+                        }
+                        resolve();
+                    })
+                    .catch(error => {
+                        console.error('Error detecting face:', error);
+                        reject(error);
+                    });
+            });
+        }
+
+        /**
+        * 图片压缩，默认同比例压缩
+        * @param {Object} path
+        * pc端传入的路径可以为相对路径，但是在移动端上必须传入的路径是照相图片储存的绝对路径
+        * @param {Object} obj
+        * obj 对象 有 width， height， quality(0-1)
+        * @param {Object} callback
+        * 回调函数有一个参数，base64的字符串数据
+        */
+        function dealImage(path, obj, callback){
+            var img = new Image();
+            img.src = path;
+            img.onload = function(){
+                var that = this;
+                // 默认按比例压缩
+                var w = that.width,
+                h = that.height,
+                scale = w / h;
+                w = obj.width || w;
+                h = obj.height || (w / scale);
+                var quality = 0.7; // 默认图片质量为0.7
+                // 生成canvas
+                var canvas = document.createElement('canvas');
+                var ctx = canvas.getContext('2d');
+                // 创建属性节点
+                var anw = document.createAttribute("width");
+                anw.nodeValue = w;
+                var anh = document.createAttribute("height");
+                anh.nodeValue = h;
+                canvas.setAttributeNode(anw);
+                canvas.setAttributeNode(anh);
+                ctx.drawImage(that, 0, 0, w, h);
+                // 图像质量
+                if (obj.quality && obj.quality <= 1 && obj.quality > 0){
+                    quality = obj.quality;
+                }
+                // quality值越小，所绘制出的图像越模糊
+                var base64 = canvas.toDataURL('image/jpeg', quality);
+                // 回调函数返回base64的值
+                callback(base64);
+            };
+        }
+
+        //-------------------------------------------------------------
+        function initrun() {
+            // 用户点击签到按钮后进行相似度比对
+            const submitButton = document.getElementById("submitinitrun");
+
+            // 如果已经上传过图片并提取了特征，则进行相似度比对
+            if (descriptors.length >= 2) {
+                const similarity = 1 - faceapi.euclideanDistance(descriptors[0], descriptors[1]);
+                console.log('Similarity:', similarity);
+                // 输出相似度
+                alert('相似度：' + similarity.toFixed(4));
+                if (similarity >= 0.6) {
+                    // 相似度大于等于0.6，允许提交表单
+                    descriptors = [];
+                    return true;
+                } else {
+                    // 相似度低于0.6，提示用户重新拍照上传图片
+                    alert("请重新拍照上传图片，以确保清晰度和准确性。");
+                    // 清空已提取的特征，等待重新上传新的图片
+                    descriptors.pop();
+                    return false;
+                }
+            } else {
+                // 提示用户先上传照片
+                alert("请先拍照上传图片。");
+                return false;
+            }
+        }
+    </script>
+
 </body>
 </html>
