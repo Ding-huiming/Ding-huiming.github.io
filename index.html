@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Comparison</title>
+</head>
+<body>
+    <h1>Face Comparison</h1>
+    <div>
+        <input type="file" id="image1Input">
+        <img id="image1" src="" alt="Image 1">
+    </div>
+    <div>
+        <input type="file" id="image2Input">
+        <img id="image2" src="" alt="Image 2">
+    </div>
+    <button id="compareButton">Compare Faces</button>
+    <div id="result"></div>
+    <div id="timeDisplay"></div>
+
+
+    <!-- 引入 face-api.js 库 -->
+    <script src="dist/face-api.min.js"></script>
+    <!-- 引入你的 JavaScript 文件 -->
+    <script src="Compare.js"></script>
+</body>
+</html>
