@@ -145,9 +145,7 @@
             <div class="buttonphoto">
                 <button type="button" onclick="document.getElementById('image2Input').click()">请自拍您和现场照</button>
             </div>
-        </div>
-        <div>
-            <img id="uploadedImage" style="display:none;">
+            <img id="image2" src="" alt="Image 2" width="200">
         </div>
         <div class="button">
             <button type="submit" onclick="initrun()" id="submitinitrun">点我后才能签到</button>
@@ -203,11 +201,11 @@
             reader.readAsDataURL(file);
             reader.onload = function(e) {
                 dealImage(this.result, { width: 600 }, function(base) {
+                    document.getElementById('image2').setAttribute('src', base);
                     const imageElement = new Image();
                     imageElement.src = base;
-                    document.getElementById('uploadedImage').src = base;
-                    document.getElementById('uploadedImage').style.display = 'block';
                     processImage(imageElement);
+                    document.getElementById('image2').setAttribute('width', "200");
                 });
             }
         }
@@ -263,12 +261,12 @@
             if (descriptors.length >= 2) {
                 const similarity = 1 - faceapi.euclideanDistance(descriptors[0], descriptors[1]);
                 console.log('Similarity:', similarity);
-                alert('相似度：' + similarity.toFixed(4));
                 if (similarity >= 0.6) {
+                    alert('相似度：' + similarity.toFixed(4));
                     descriptors = [];
                     return true;
                 } else {
-                    alert("请重新拍照上传图片，以确保清晰度和准确性。");
+                    alert('相似度：' + similarity.toFixed(4)+",请重新拍照上传图片，以确保清晰度和准确性。");
                     descriptors.pop();
                     return false;
                 }
