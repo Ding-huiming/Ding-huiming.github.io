@@ -261,12 +261,12 @@
             if (descriptors.length >= 2) {
                 const similarity = 1 - faceapi.euclideanDistance(descriptors[0], descriptors[1]);
                 console.log('Similarity:', similarity);
-                alert('相似度：' + similarity.toFixed(4));
                 if (similarity >= 0.6) {
+                    alert('相似度：' + similarity.toFixed(4));
                     descriptors = [];
                     return true;
                 } else {
-                    alert("请重新拍照上传图片，以确保清晰度和准确性。");
+                    alert('相似度：' + similarity.toFixed(4)+",请重新拍照上传图片，以确保清晰度和准确性。");
                     descriptors.pop();
                     return false;
                 }
