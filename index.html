@@ -5,203 +5,213 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Face Comparison</title>
     <style type="text/css">
-  * {
-    margin: 0;
-    padding: 0;
-  }
+        * {
+            margin: 0;
+            padding: 0;
+        }
 
-  ul, li {
-    list-style: none;
-  }
+        ul, li {
+            list-style: none;
+        }
 
-  a {
-    text-decoration: none;
-  }
+        a {
+            text-decoration: none;
+        }
 
-  input {
-    outline-style: none;
-    border: 0px;
-  }
+        input {
+            outline-style: none;
+            border: 0px;
+        }
 
-  #form1 {
-    margin-top: 20px;
-    width: 80%;
-    margin: 2px auto;
-  }
+        #form1 {
+            margin-top: 20px;
+            width: 80%;
+            margin: 2px auto;
+        }
 
-  #form1 form span {
-    color: #999;
-  }
+        #form1 form span {
+            color: #999;
+        }
 
-  .row {
-    margin-top: 25px;
-    height: 50px;
-    line-height: 26px;
-    border-bottom: 1px solid #c7c6c6;
-    width: 100%;
-  }
+        .row {
+            margin-top: 25px;
+            height: 50px;
+            line-height: 26px;
+            border-bottom: 1px solid #c7c6c6;
+            width: 100%;
+        }
 
-  .input {
-    position: relative;
-    width: 100%;
-    height: 26px;
-  }
+        .input {
+            position: relative;
+            width: 100%;
+            height: 26px;
+        }
 
-  .input input {
-    display: block;
-    width: 100%;
-    height: 26px;
-    border: none;
-    background: none;
-    outline: none;
-  }
+        .input input {
+            display: block;
+            width: 100%;
+            height: 26px;
+            border: none;
+            background: none;
+            outline: none;
+        }
 
-  .input label {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 26px;
-    line-height: 26px;
-    font-size: 14px;
-    color: #999;
-  }
+        .input label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 26px;
+            line-height: 26px;
+            font-size: 14px;
+            color: #999;
+        }
 
-  .select select {
-    display: block;
-    width: 100%;
-    border: none;
-    outline: none;
-  }
+        .select select {
+            display: block;
+            width: 100%;
+            border: none;
+            outline: none;
+        }
 
-  input[type=date]::-webkit-inner-spin-button {
-    visibility: hidden;
-  }
+        input[type=date]::-webkit-inner-spin-button {
+            visibility: hidden;
+        }
 
-  .button {
-    width: 100%;
-    height: 40px;
-    background: #ff961e;
-    outline: none;
-    margin: 20px 0 30px 0;
-  }
+        .button {
+            width: 100%;
+            height: 40px;
+            background: #ff961e;
+            outline: none;
+            margin: 20px 0 30px 0;
+        }
 
-  .button button {
-    border: 0px;
-    background-color: transparent;
-    color: white;
-    width: 100%;
-    height: 40px;
-    margin: 0 auto;
-    font-size: 17px;
-  }
+        .button button {
+            border: 0px;
+            background-color: transparent;
+            color: white;
+            width: 100%;
+            height: 40px;
+            margin: 0 auto;
+            font-size: 17px;
+        }
 
-  .buttonphoto button {
-    border: 0px;
-    background-color: gray;
-    color: white;
-    width: 100%;
-    height: 40px;
-    margin: 0 auto;
-    font-size: 17px;
-  }
+        .buttonphoto {
+            width: 100%;
+            height: 40px;
+            background: gray;
+            outline: none;
+            margin: 20px 0;
+        }
 
-  img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-  }
-</style>
+        .buttonphoto button {
+            border: 0px;
+            background-color: transparent;
+            color: white;
+            width: 100%;
+            height: 40px;
+            margin: 0 auto;
+            font-size: 17px;
+        }
 
+        img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .quote {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
-    <h1>Face Comparison</h1>
-    <div>
-        <input type="file" id="image1Input" style="display:none;" onchange="previewImage(this)">
-        <div class="buttonphoto">
-            <button type="button" onclick="document.getElementById('image1Input').click()">上传学籍图片</button>
+    <div id="form1">
+        <div class="row">
+            <label for="studentId">学号</label>
+            <input type="text" id="studentId" value="2019304010110" readonly>
         </div>
-        <img id="image1" src="" alt="Image 1" width="200">
-    </div>
-    <div>
-        <!-- 使用拍照上传方式 -->
-        <input type="file" accept="image/*" capture="camera" id="image2Input" style="display:none;" onchange="readFile(this)">
-        <div class="buttonphoto">
-            <button type="button" onclick="document.getElementById('image2Input').click()">请自拍您和现场照</button>
+        <div class="row">
+            <label for="name">姓名</label>
+            <input type="text" id="name" value="丁慧明" readonly>
         </div>
-        <img id="image2" src="" alt="Image 2" width="200">
+        <div class="row">
+            <p>因签到需要，请允许获取您的位置</p>
+        </div>
+        <div>
+            <input type="file" accept="image/*" capture="camera" id="image2Input" style="display:none;" onchange="readFile(this)">
+            <div class="buttonphoto">
+                <button type="button" onclick="document.getElementById('image2Input').click()">请自拍您和现场照</button>
+            </div>
+            <img id="image2" src="" alt="Image 2" width="200">
+        </div>
+        <div class="button">
+            <button type="submit" onclick="initrun()" id="submitinitrun">点我后才能签到</button>
+        </div>
     </div>
-    <div class="button">
-        <button type="submit"  onclick="initrun()" id="submitinitrun">点我后才能签到</button>
+    <div class="quote">
+        <p>业精于勤，荒于嬉。---韩愈</p>
     </div>
-    <div id="result"></div>
-    <div id="timeDisplay"></div>
 
     <!-- 引入 face-api.js 库 -->
     <script src="dist/face-api.min.js"></script>
     <script>
-        // 使用 Promise 和 .then() 来处理异步操作
         faceapi.loadSsdMobilenetv1Model('/weights')
             .then(() => faceapi.loadFaceLandmarkModel('/weights'))
             .then(() => faceapi.loadFaceRecognitionModel('/weights'))
             .then(() => {
                 console.log('模型加载完成！');
+                processPredefinedImage();
             })
             .catch(error => {
                 console.error('加载模型时出现错误：', error);
             });
 
-        // 声明全局变量 descriptors，初始化为空数组
         var descriptors = [];
-        function previewImage(obj){
+
+        function processPredefinedImage() {
+            const predefinedImagePath = 'q3.jpg';
+            const imageElement = new Image();
+            imageElement.src = predefinedImagePath;
+            imageElement.onload = function() {
+                faceapi.detectSingleFace(imageElement).withFaceLandmarks().withFaceDescriptor()
+                    .then(detection => {
+                        if (detection) {
+                            descriptors.push(detection.descriptor);
+                            console.log('Predefined image processed and descriptor saved:', descriptors);
+                        } else {
+                            console.error('No face detected in the predefined image');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error detecting face in predefined image:', error);
+                    });
+            }
+        }
+
+        function readFile(obj) {
             var file = obj.files[0];
-            // 判断类型是不是图片
             if (!/image\/\w+/.test(file.type)) {
                 alert("请确保文件为图像类型");
                 return false;
             }
             var reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = function(e){
-                dealImage(this.result, { width: 600 }, function(base){
-                    document.getElementById('image1').setAttribute('src', base);
-                    // 创建新的图像元素
-                    const imageElement = new Image();
-                    // 设置图像元素的 src 属性为 base64 字符串
-                    imageElement.src = base;
-                    // 将图像元素传递给人脸处理函数
-                    processImage(imageElement);
-                    document.getElementById('image1').setAttribute('width',"200");
-                });
-            };
-        }
-
-        function readFile(obj){
-            var file = obj.files[0];
-            //判断类型是不是图片
-            if(!/image\/\w+/.test(file.type)){
-                alert("请确保文件为图像类型");
-                return false;
-            }
-            var reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function(e){
-                dealImage(this.result, { width: 600 }, function(base){
+            reader.onload = function(e) {
+                dealImage(this.result, { width: 600 }, function(base) {
                     document.getElementById('image2').setAttribute('src', base);
-                    // 创建新的图像元素
                     const imageElement = new Image();
-                    // 设置图像元素的 src 属性为 base64 字符串
                     imageElement.src = base;
-                    // 将图像元素传递给人脸处理函数
                     processImage(imageElement);
-                    document.getElementById('image2').setAttribute('width',"200");
+                    document.getElementById('image2').setAttribute('width', "200");
                 });
             }
         }
-
 
         function processImage(imageElement) {
             return new Promise((resolve, reject) => {
-                // 进行人脸检测和特征提取
                 faceapi.detectSingleFace(imageElement).withFaceLandmarks().withFaceDescriptor()
                     .then(detection => {
                         if (detection) {
@@ -219,31 +229,19 @@
             });
         }
 
-        /**
-        * 图片压缩，默认同比例压缩
-        * @param {Object} path
-        * pc端传入的路径可以为相对路径，但是在移动端上必须传入的路径是照相图片储存的绝对路径
-        * @param {Object} obj
-        * obj 对象 有 width， height， quality(0-1)
-        * @param {Object} callback
-        * 回调函数有一个参数，base64的字符串数据
-        */
-        function dealImage(path, obj, callback){
+        function dealImage(path, obj, callback) {
             var img = new Image();
             img.src = path;
-            img.onload = function(){
+            img.onload = function() {
                 var that = this;
-                // 默认按比例压缩
                 var w = that.width,
-                h = that.height,
-                scale = w / h;
+                    h = that.height,
+                    scale = w / h;
                 w = obj.width || w;
                 h = obj.height || (w / scale);
-                var quality = 0.7; // 默认图片质量为0.7
-                // 生成canvas
+                var quality = 0.7;
                 var canvas = document.createElement('canvas');
                 var ctx = canvas.getContext('2d');
-                // 创建属性节点
                 var anw = document.createAttribute("width");
                 anw.nodeValue = w;
                 var anh = document.createAttribute("height");
@@ -251,46 +249,32 @@
                 canvas.setAttributeNode(anw);
                 canvas.setAttributeNode(anh);
                 ctx.drawImage(that, 0, 0, w, h);
-                // 图像质量
-                if (obj.quality && obj.quality <= 1 && obj.quality > 0){
+                if (obj.quality && obj.quality <= 1 && obj.quality > 0) {
                     quality = obj.quality;
                 }
-                // quality值越小，所绘制出的图像越模糊
                 var base64 = canvas.toDataURL('image/jpeg', quality);
-                // 回调函数返回base64的值
                 callback(base64);
             };
         }
 
-        //-------------------------------------------------------------
         function initrun() {
-            // 用户点击签到按钮后进行相似度比对
-            const submitButton = document.getElementById("submitinitrun");
-
-            // 如果已经上传过图片并提取了特征，则进行相似度比对
             if (descriptors.length >= 2) {
                 const similarity = 1 - faceapi.euclideanDistance(descriptors[0], descriptors[1]);
                 console.log('Similarity:', similarity);
-                // 输出相似度
                 alert('相似度：' + similarity.toFixed(4));
                 if (similarity >= 0.6) {
-                    // 相似度大于等于0.6，允许提交表单
                     descriptors = [];
                     return true;
                 } else {
-                    // 相似度低于0.6，提示用户重新拍照上传图片
                     alert("请重新拍照上传图片，以确保清晰度和准确性。");
-                    // 清空已提取的特征，等待重新上传新的图片
                     descriptors.pop();
                     return false;
                 }
             } else {
-                // 提示用户先上传照片
                 alert("请先拍照上传图片。");
                 return false;
             }
         }
     </script>
-
 </body>
 </html>
