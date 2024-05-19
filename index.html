@@ -1,129 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face Comparison</title>
+    <title>签到页面</title>
     <style type="text/css">
         * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
-        ul, li {
-            list-style: none;
-        }
-
-        a {
-            text-decoration: none;
-        }
-
-        input {
-            outline-style: none;
-            border: 0px;
+        body {
+            font-family: Arial, sans-serif;
         }
 
         #form1 {
-            margin-top: 20px;
             width: 80%;
-            margin: 2px auto;
-        }
-
-        #form1 form span {
-            color: #999;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
         }
 
         .row {
-            margin-top: 25px;
-            height: 50px;
-            line-height: 26px;
-            border-bottom: 1px solid #c7c6c6;
-            width: 100%;
+            margin-bottom: 20px;
         }
 
-        .input {
-            position: relative;
-            width: 100%;
-            height: 26px;
-        }
-
-        .input input {
+        .row label {
             display: block;
-            width: 100%;
-            height: 26px;
-            border: none;
-            background: none;
-            outline: none;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #333;
         }
 
-        .input label {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 26px;
-            line-height: 26px;
+        .row input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: none;
+            border-bottom: 1px solid #c7c6c6;
+            background-color: #f9f9f9;
+        }
+
+        .row p {
             font-size: 14px;
             color: #999;
         }
 
-        .select select {
-            display: block;
+        .buttonphoto, .button {
+            margin-top: 20px;
+        }
+
+        .buttonphoto button, .button button {
             width: 100%;
+            padding: 10px;
+            font-size: 16px;
             border: none;
-            outline: none;
-        }
-
-        input[type=date]::-webkit-inner-spin-button {
-            visibility: hidden;
-        }
-
-        .button {
-            width: 100%;
-            height: 40px;
-            background: #ff961e;
-            outline: none;
-            margin: 20px 0 30px 0;
-        }
-
-        .button button {
-            border: 0px;
-            background-color: transparent;
-            color: white;
-            width: 100%;
-            height: 40px;
-            margin: 0 auto;
-            font-size: 17px;
-        }
-
-        .buttonphoto {
-            width: 100%;
-            height: 40px;
-            background: gray;
-            outline: none;
-            margin: 20px 0;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
         }
 
         .buttonphoto button {
-            border: 0px;
-            background-color: transparent;
-            color: white;
-            width: 100%;
-            height: 40px;
-            margin: 0 auto;
-            font-size: 17px;
+            background-color: gray;
+        }
+
+        .button button {
+            background-color: #ff961e;
         }
 
         img {
             display: block;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 20px auto;
+            width: 200px;
         }
 
         .quote {
             text-align: center;
-            margin: 20px 0;
+            margin-top: 20px;
             font-size: 14px;
             color: #666;
+        }
+
+        .quote-title {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -145,12 +110,13 @@
             <div class="buttonphoto">
                 <button type="button" onclick="document.getElementById('image2Input').click()">请自拍您和现场照</button>
             </div>
-            <img id="image2" src="" alt="Image 2" width="200">
+            <img id="image2" src="" alt="Image 2">
         </div>
         <div class="button">
             <button type="submit" onclick="initrun()" id="submitinitrun">点我后才能签到</button>
         </div>
     </div>
+    <div class="quote-title">名人名言</div>
     <div class="quote">
         <p>业精于勤，荒于嬉。---韩愈</p>
     </div>
@@ -266,7 +232,7 @@
                     descriptors = [];
                     return true;
                 } else {
-                    alert('相似度：' + similarity.toFixed(4)+",请重新拍照上传图片，以确保清晰度和准确性。");
+                    alert('相似度：' + similarity.toFixed(4) + ",请重新拍照上传图片，以确保清晰度和准确性。");
                     descriptors.pop();
                     return false;
                 }
