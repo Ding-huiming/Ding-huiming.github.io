@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>签到页面</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #form1 {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            border: none #ccc;
+            border-radius: 10px;
+        }
+
+        .row {
+            margin-bottom: 20px;
+        }
+
+        .row label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #999;
+        }
+
+        .row input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: none;
+            border-bottom: 1px solid #c7c6c6;
+            background-color: #ffffff;
+        }
+
+        .row p {
+            font-size: 14px;
+            color: #000000;
+        }
+
+        .buttonphoto, .button {
+            margin-top: 20px;
+        }
+
+        .buttonphoto button, .button button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .buttonphoto button {
+            background-color: gray;
+        }
+
+        .button button {
+            background-color: #ff961e;
+        }
+
+        img {
+            display: block;
+            margin: 20px auto;
+            width: 200px;
+            display: none;
+        }
+
+        .quote {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .quote-title {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+        }
+    </style>
+    <!-- 预加载关键资源 -->
+    <link rel="preload" href="dist/face-api.min.js" as="script">
+    <link rel="preload" href="q3.jpg" as="image">
+</head>
+<body>
+    <div id="form1">
+        <div class="row">
+            <label for="studentId">学号</label>
+            <input type="text" id="studentId" value="2019304010110" readonly>
+        </div>
+        <div class="row">
+            <label for="name">姓名</label>
+            <input type="text" id="name" value="丁慧明" readonly>
+        </div>
+        <div class="row">
+            <p>因签到需要，请允许获取您的位置</p>
+        </div>
+        <div>
+            <input type="file" accept="image/*" capture="camera" id="image2Input" style="display:none;" onchange="readFile(this)">
+            <div class="buttonphoto">
+                <button type="button" onclick="document.getElementById('image2Input').click()">请自拍您和现场照</button>
+            </div>
+            <img id="image2" src="" alt="Image 2">
+        </div>
+        <div class="button">
+            <button type="submit" onclick="initrun()" id="submitinitrun">点我后才能签到</button>
+        </div>
+    </div>
+    <div class="quote-title">名人名言</div>
+    <div class="quote">
+        <p>业精于勤，荒于嬉。---韩愈</p>
+    </div>
+
+    <!-- 引入 face-api.js 库 -->
+    <script src="dist/face-api.min.js"></script>
+    <script>
+        let descriptors = [];
+        let uploadStartTime, uploadEndTime;
+        let signInStartTime, signInEndTime;
+
+        async function loadModels() {
+            await faceapi.loadSsdMobilenetv1Model('/weights');
+            await faceapi.loadFaceLandmarkModel('/weights');
+            await faceapi.loadFaceRecognitionModel('/weights');
+            console.log('模型加载完成！');
+            processPredefinedImage();
+        }
+
+        async function processPredefinedImage() {
+            const predefinedImagePath = 'q3.jpg';
+            const imageElement = new Image();
+            imageElement.src = predefinedImagePath;
+            imageElement.onload = async function() {
+                const detection = await faceapi.detectSingleFace(imageElement).withFaceLandmarks().withFaceDescriptor();
+                if (detection) {
+                    descriptors.push(detection.descriptor);
+                    console.log('预定义图片已处理，描述符已保存:', descriptors);
+                } else {
+                    console.error('预定义图片中未检测到人脸');
+                }
+            }
+        }
+
+        function readFile(obj) {
+            uploadStartTime = performance.now();
+            const file = obj.files[0];
+            if (!/image\/\w+/.test(file.type)) {
+                alert("请确保文件为图像类型");
+                return false;
+            }
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e) {
+                dealImage(this.result, { width: 600 }, function(base) {
+                    document.getElementById('image2').setAttribute('src', base);
+                    document.getElementById('image2').style.display = 'block';
+                    const imageElement = new Image();
+                    imageElement.src = base;
+                    processImage(imageElement).then(faceDetected => {
+                        document.getElementById('image2').setAttribute('width', "200");
+                        uploadEndTime = performance.now();
+                        console.log('图片上传和处理时间:', (uploadEndTime - uploadStartTime) + 'ms');
+                        if (!faceDetected) {
+                            alert('未识别到人脸，请重新拍照');
+                            resetImageUpload();
+                        }
+                    });
+                });
+            }
+        }
+
+        async function processImage(imageElement) {
+            const detection = await faceapi.detectSingleFace(imageElement).withFaceLandmarks().withFaceDescriptor();
+            if (detection) {
+                descriptors.push(detection.descriptor);
+                console.log('人脸已检测并保存描述符:', descriptors);
+                return true;
+            } else {
+                console.error('上传的图片中未检测到人脸');
+                return false;
+            }
+        }
+
+        function dealImage(path, obj, callback) {
+            const img = new Image();
+            img.src = path;
+            img.onload = function() {
+                const that = this;
+                let w = that.width,
+                    h = that.height,
+                    scale = w / h;
+                w = obj.width || w;
+                h = obj.height || (w / scale);
+                let quality = 0.7;
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const anw = document.createAttribute("width");
+                anw.nodeValue = w;
+                const anh = document.createAttribute("height");
+                anh.nodeValue = h;
+                canvas.setAttributeNode(anw);
+                canvas.setAttributeNode(anh);
+                ctx.drawImage(that, 0, 0, w, h);
+                if (obj.quality && obj.quality <= 1 && obj.quality > 0) {
+                    quality = obj.quality;
+                }
+                const base64 = canvas.toDataURL('image/jpeg', quality);
+                callback(base64);
+            };
+        }
+
+        function resetImageUpload() {
+            document.getElementById('image2').setAttribute('src', '');
+            document.getElementById('image2').style.display = 'none';
+            document.getElementById('image2Input').value = '';
+        }
+
+        async function initrun() {
+            signInStartTime = performance.now();
+            if (descriptors.length === 1) {
+                alert("请先拍照上传图片。");
+                signInEndTime = performance.now();
+                console.log('人脸识别时间:', (signInEndTime - signInStartTime) + 'ms');
+                return false;
+            } else if (descriptors.length >= 2) {
+                const similarity = 1 - faceapi.euclideanDistance(descriptors[0], descriptors[1]);
+                signInEndTime = performance.now();
+                console.log('相似度:', similarity);
+                console.log('签到按钮点击后的时间:', (signInEndTime - signInStartTime) + 'ms');
+                if (similarity >= 0.6) {
+                    alert('相似度：' + similarity.toFixed(4) + ",签到成功！");
+                    descriptors = [];
+                    return true;
+                } else {
+                    alert('相似度：' + similarity.toFixed(4) + ",请重新拍照上传图片，以确保清晰度和准确性。");
+                    resetImageUpload();
+                    descriptors.pop();
+                    return false;
+                }
+            }
+        }
+
+        // 加载模型
+        loadModels();
+    </script>
+</body>
+</html>
