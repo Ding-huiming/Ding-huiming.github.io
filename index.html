@@ -74,6 +74,7 @@
             display: block;
             margin: 20px auto;
             width: 200px;
+            display: none;
         }
 
         .quote {
@@ -136,6 +137,8 @@
             });
 
         var descriptors = [];
+        var uploadStartTime, uploadEndTime;
+        var signInStartTime, signInEndTime;
 
         function processPredefinedImage() {
             const predefinedImagePath = 'q3.jpg';
@@ -158,6 +161,7 @@
         }
 
         function readFile(obj) {
+            uploadStartTime = performance.now();
             var file = obj.files[0];
             if (!/image\/\w+/.test(file.type)) {
                 alert("请确保文件为图像类型");
@@ -170,8 +174,15 @@
                     document.getElementById('image2').setAttribute('src', base);
                     const imageElement = new Image();
                     imageElement.src = base;
-                    processImage(imageElement);
-                    document.getElementById('image2').setAttribute('width', "200");
+                    processImage(imageElement).then(faceDetected => {
+                        document.getElementById('image2').setAttribute('width', "200");
+                        uploadEndTime = performance.now();
+                        console.log('图片上传和处理时间:', (uploadEndTime - uploadStartTime) + 'ms');
+                        if (!faceDetected) {
+                            alert('未识别到人脸，请重新拍照');
+                            resetImageUpload();
+                        }
+                    });
                 });
             }
         }
@@ -183,10 +194,11 @@
                         if (detection) {
                             descriptors.push(detection.descriptor);
                             console.log('Face detected and descriptor saved:', descriptors);
+                            resolve(true);
                         } else {
                             console.error('No face detected in the uploaded image');
+                            resolve(false);
                         }
-                        resolve();
                     })
                     .catch(error => {
                         console.error('Error detecting face:', error);
@@ -223,22 +235,33 @@
             };
         }
 
+        function resetImageUpload() {
+            document.getElementById('image2').setAttribute('src', '');
+            document.getElementById('image2Input').value = '';
+        }
+
         function initrun() {
-            if (descriptors.length >= 2) {
+            signInStartTime = performance.now();
+            if (descriptors.length === 1) {
+                alert("请先拍照上传图片。");
+                signInEndTime = performance.now();
+                console.log('人脸识别时间:', (signInEndTime - signInStartTime) + 'ms');
+                return false;
+            } else if (descriptors.length >= 2) {
                 const similarity = 1 - faceapi.euclideanDistance(descriptors[0], descriptors[1]);
+                signInEndTime = performance.now();
                 console.log('Similarity:', similarity);
+                console.log('签到按钮点击后的时间:', (signInEndTime - signInStartTime) + 'ms');
                 if (similarity >= 0.6) {
-                    alert('相似度：' + similarity.toFixed(4));
+                    alert('相似度：' + similarity.toFixed(4) + ",签到成功。“);
                     descriptors = [];
                     return true;
                 } else {
                     alert('相似度：' + similarity.toFixed(4) + ",请重新拍照上传图片，以确保清晰度和准确性。");
+                    resetImageUpload();
                     descriptors.pop();
                     return false;
                 }
-            } else {
-                alert("请先拍照上传图片。");
-                return false;
             }
         }
     </script>
