@@ -172,6 +172,7 @@
             reader.onload = function(e) {
                 dealImage(this.result, { width: 600 }, function(base) {
                     document.getElementById('image2').setAttribute('src', base);
+                    document.getElementById('image2').style.display = 'block';
                     const imageElement = new Image();
                     imageElement.src = base;
                     processImage(imageElement).then(faceDetected => {
@@ -237,6 +238,7 @@
 
         function resetImageUpload() {
             document.getElementById('image2').setAttribute('src', '');
+            document.getElementById('image2').style.display = 'none';
             document.getElementById('image2Input').value = '';
         }
 
@@ -253,7 +255,7 @@
                 console.log('Similarity:', similarity);
                 console.log('签到按钮点击后的时间:', (signInEndTime - signInStartTime) + 'ms');
                 if (similarity >= 0.6) {
-                    alert('相似度：' + similarity.toFixed(4) + ",签到成功。“);
+                    alert('相似度：' + similarity.toFixed(4) + ",签到成功！");
                     descriptors = [];
                     return true;
                 } else {
